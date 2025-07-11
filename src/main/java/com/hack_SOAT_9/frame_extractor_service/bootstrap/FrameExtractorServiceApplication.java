@@ -1,4 +1,4 @@
-package com.hack_SOAT_9.frame_extractor_service;
+package com.hack_SOAT_9.frame_extractor_service.bootstrap;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
