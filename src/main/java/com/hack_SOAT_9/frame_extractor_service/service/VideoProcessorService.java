@@ -6,6 +6,9 @@ import java.io.*;
 import java.nio.file.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import org.springframework.stereotype.Service;
+
+@Service
 
 public class VideoProcessorService {
 
