@@ -6,6 +6,7 @@ import java.io.*;
 import java.nio.file.*;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
+import static org.mockito.Mockito.mock;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -36,9 +37,11 @@ class VideoProcessorServiceTest {
 
     @Test
     void shouldCreateZipFromFramesWithoutRunningFfmpeg() {
+
+        VideoEventService mockVideoEventService = mock(VideoEventService.class);
         VideoMessage message = VideoMessage.withVideoNameAndPath("test_video.mp4", "dummy/path/test_video.mp4");
 
-        VideoProcessorService service = new VideoProcessorService() {
+        VideoProcessorService service = new VideoProcessorService(mockVideoEventService) {
             @Override
             public void processVideo(VideoMessage event) {
                 try {

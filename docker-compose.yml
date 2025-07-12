@@ -28,3 +28,17 @@ services:
     ports:
       - 15672:15672
       - 5672:5672
+
+  frame_extractor_service:
+    build:
+      context: ../
+    container_name: frame_extractor_service
+    ports:
+      - "8082:8082"
+    depends_on:
+      - postgres
+      - rabbitmq
+      - redis
+    networks:
+      - postgres-network
+    restart: unless-stopped
