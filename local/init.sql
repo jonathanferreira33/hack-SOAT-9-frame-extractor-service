@@ -1,4 +1,4 @@
---CREATE DATABASE fiapdb;
+CREATE DATABASE fiapdb;
 \connect fiapdb;
 
 CREATE TABLE IF NOT EXISTS video_processing_event_entity (

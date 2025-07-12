@@ -5,12 +5,14 @@ import com.hack_SOAT_9.frame_extractor_service.domain.entity.VideoProcessingEven
 import com.hack_SOAT_9.frame_extractor_service.utils.VideoMessageMapper;
 import com.hack_SOAT_9.frame_extractor_service.utils.VideoProcessingStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.nio.file.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+@Service
 public class VideoProcessorService {
 
     private final VideoEventService videoEventService;

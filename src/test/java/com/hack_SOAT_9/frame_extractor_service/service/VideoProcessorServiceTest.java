@@ -9,24 +9,37 @@ import java.util.zip.ZipOutputStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+
 class VideoProcessorServiceTest {
 
     private static final String FRAME_DIR = "frames";
     private static final String ZIP_NAME = "test_video_frames.zip";
+    private VideoEventService mockEventService;
+
+    @Mock
+    private VideoEventService videoEventService;
+
+    private VideoProcessorService service;
 
     @BeforeEach
     void setUp() throws IOException {
-        // Cria a pasta de frames simulada
+        MockitoAnnotations.openMocks(this);
+        service = new VideoProcessorService(videoEventService);
+
         Files.createDirectories(Paths.get(FRAME_DIR));
         for (int i = 1; i <= 3; i++) {
             Path frame = Paths.get(FRAME_DIR, "frame_000" + i + ".jpg");
             Files.write(frame, ("frame" + i).getBytes());
         }
+
+        Files.write(Paths.get("test_video.mp4"), new byte[10]);
     }
 
     @AfterEach
     void cleanUp() throws IOException {
-        // Deleta arquivos criados
         Files.walk(Paths.get(FRAME_DIR))
                 .map(Path::toFile)
                 .forEach(File::delete);
@@ -38,11 +51,11 @@ class VideoProcessorServiceTest {
     void shouldCreateZipFromFramesWithoutRunningFfmpeg() {
         VideoMessage message = VideoMessage.withVideoNameAndPath("test_video.mp4", "dummy/path/test_video.mp4");
 
-        VideoProcessorService service = new VideoProcessorService() {
+        VideoProcessorService service = new VideoProcessorService(mockEventService) {
             @Override
             public void processVideo(VideoMessage event) {
                 try {
-                    String zipFileName = event.videoName().replaceAll("\\..+$", "") + "_frames.zip";
+                    String zipFileName = "test_video_frames.zip";
                     try (ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(zipFileName))) {
                         Files.list(Paths.get(FRAME_DIR))
                                 .filter(Files::isRegularFile)
@@ -69,11 +82,12 @@ class VideoProcessorServiceTest {
         service.processVideo(message);
 
         File zip = new File(ZIP_NAME);
-        assertTrue(zip.exists());
+        assertTrue(zip.exists(), "Arquivo ZIP não foi criado.");
         try (ZipFile zipFile = new ZipFile(zip)) {
-            assertEquals(3, zipFile.size());
+            assertEquals(3, zipFile.size(), "Quantidade de arquivos no ZIP incorreta.");
         } catch (IOException e) {
             fail("Erro ao ler o ZIP: " + e.getMessage());
         }
     }
 }
+

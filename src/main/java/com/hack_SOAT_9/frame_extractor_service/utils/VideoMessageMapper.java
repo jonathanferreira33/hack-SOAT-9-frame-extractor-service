@@ -15,7 +15,7 @@ public class VideoMessageMapper {
 
         VideoProcessingEventEntity entity = new VideoProcessingEventEntity();
 
-        entity.setUserId(message.userId());
+        entity.setUserID(message.userId());
         entity.setVideoName(message.videoName());
         entity.setOutputDir(message.outputDir());
         entity.setVideoPath(message.videoPath());
@@ -39,7 +39,7 @@ public class VideoMessageMapper {
         }
 
         return new VideoMessage(
-                entity.getUserId(),
+                entity.getUserID(),
                 entity.getVideoName(),
                 entity.getOutputDir(),
                 entity.getVideoPath(),
