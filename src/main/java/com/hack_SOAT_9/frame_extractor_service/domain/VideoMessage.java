@@ -1,59 +1,38 @@
 package com.hack_SOAT_9.frame_extractor_service.domain;
 
-public class VideoMessage {
-    private String id;
-    private String userId;
-    private String videoName;
-    private String videoPath;
-    private String status;
+import com.hack_SOAT_9.frame_extractor_service.utils.VideoProcessingStatus;
 
-    public VideoMessage() {}
+import java.io.Serializable;
 
-    public VideoMessage(String id, String userId, String videoName, String videoPath, String status) {
-        this.id = id;
-        this.userId = userId;
-        this.videoName = videoName;
-        this.status = status;
-        this.videoPath = videoPath;
+public record VideoMessage (
+    String userId,
+    String videoName,
+    String outputDir,
+    String videoPath,
+    String queuedAt,
+    VideoProcessingStatus status
+) implements Serializable {
+    public static VideoMessage withVideoNameAndPath(String videoName, String videoPath) {
+        return new VideoMessage(
+                null,
+                videoName,
+                null,
+                videoPath,
+                null,
+                VideoProcessingStatus.PROCESSING
+        );
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getVideoName() {
-        return videoName;
-    }
-
-    public void setVideoName(String videoName) {
-        this.videoName = videoName;
-    }
-
-    public String getVideoPath() {
-        return videoPath;
-    }
-
-    public void setVideoPath(String videoPath) {
-        this.videoPath = videoPath;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
+    public static VideoMessage full(String userId, String videoName, String outputDir,
+                                    String videoPath, String queuedAt, VideoProcessingStatus status) {
+        return new VideoMessage(
+                userId,
+                videoName,
+                outputDir,
+                videoPath,
+                queuedAt,
+                status
+        );
     }
 }
+

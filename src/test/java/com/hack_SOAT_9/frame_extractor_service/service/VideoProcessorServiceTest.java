@@ -36,16 +36,13 @@ class VideoProcessorServiceTest {
 
     @Test
     void shouldCreateZipFromFramesWithoutRunningFfmpeg() {
-        VideoMessage message = new VideoMessage();
-        message.setVideoName("test_video.mp4");
-        message.setVideoPath("dummy/path/test_video.mp4");
+        VideoMessage message = VideoMessage.withVideoNameAndPath("test_video.mp4", "dummy/path/test_video.mp4");
 
         VideoProcessorService service = new VideoProcessorService() {
             @Override
             public void processVideo(VideoMessage event) {
                 try {
-                    // Pula o ffmpeg e vai direto para o zip
-                    String zipFileName = event.getVideoName().replaceAll("\\..+$", "") + "_frames.zip";
+                    String zipFileName = event.videoName().replaceAll("\\..+$", "") + "_frames.zip";
                     try (ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(zipFileName))) {
                         Files.list(Paths.get(FRAME_DIR))
                                 .filter(Files::isRegularFile)
@@ -71,7 +68,6 @@ class VideoProcessorServiceTest {
 
         service.processVideo(message);
 
-        // Verificar se o ZIP foi criado
         File zip = new File(ZIP_NAME);
         assertTrue(zip.exists());
         try (ZipFile zipFile = new ZipFile(zip)) {

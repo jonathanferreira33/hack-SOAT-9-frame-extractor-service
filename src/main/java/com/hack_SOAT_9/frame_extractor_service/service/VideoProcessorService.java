@@ -1,6 +1,10 @@
 package com.hack_SOAT_9.frame_extractor_service.service;
 
 import com.hack_SOAT_9.frame_extractor_service.domain.VideoMessage;
+import com.hack_SOAT_9.frame_extractor_service.domain.entity.VideoProcessingEventEntity;
+import com.hack_SOAT_9.frame_extractor_service.utils.VideoMessageMapper;
+import com.hack_SOAT_9.frame_extractor_service.utils.VideoProcessingStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.*;
 import java.nio.file.*;
@@ -12,25 +16,30 @@ import org.springframework.stereotype.Service;
 
 public class VideoProcessorService {
 
+    private final VideoEventService videoEventService;
+
     private static final String FRAME_OUTPUT_DIR = "frames";
 
-    public void processVideo(VideoMessage event) {
-        try {
-            System.out.println("Processando vídeo: " + event.getVideoName());
+    @Autowired
+    public VideoProcessorService(VideoEventService videoEventService) {
+        this.videoEventService = videoEventService;
+    }
 
-            // 1. Criar diretório de saída
+    public void processVideo(VideoMessage event) {
+        VideoProcessingEventEntity eventEntity = VideoMessageMapper.toEntity(event);
+        try {
+            System.out.println("Processando vídeo: " + event.videoName());
+
             Path frameDir = Paths.get(FRAME_OUTPUT_DIR);
             Files.createDirectories(frameDir);
 
-            // 2. Executar o ffmpeg
             String framePattern = FRAME_OUTPUT_DIR + "/frame_%04d.jpg";
             ProcessBuilder pb = new ProcessBuilder(
-                    "ffmpeg", "-i", event.getVideoName(), framePattern
+                    "ffmpeg", "-i", event.videoName(), framePattern
             );
             pb.redirectErrorStream(true);
             Process process = pb.start();
 
-            // 3. Log do ffmpeg
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
@@ -43,8 +52,7 @@ public class VideoProcessorService {
                 throw new RuntimeException("ffmpeg falhou com código: " + exitCode);
             }
 
-            // 4. Compactar os frames em um .zip
-            String zipFileName = event.getVideoName().replaceAll("\\..+$", "") + "_frames.zip";
+            String zipFileName = event.videoName().replaceAll("\\..+$", "") + "_frames.zip";
             try (ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(zipFileName))) {
                 Files.list(frameDir)
                         .filter(Files::isRegularFile)
@@ -65,10 +73,14 @@ public class VideoProcessorService {
                             }
                         });
             }
+            eventEntity.setStatus(VideoProcessingStatus.SUCCESS);
+            videoEventService.saveEvent(eventEntity);
 
             System.out.println("ZIP gerado: " + zipFileName);
 
         } catch (Exception e) {
+            eventEntity.setStatus(VideoProcessingStatus.ERROR);
+            videoEventService.saveEvent(eventEntity);
             e.printStackTrace();
         }
     }

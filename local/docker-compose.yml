@@ -1,30 +1,61 @@
+
 services:
-  db:
+  postgres:
     container_name: postgres
-    image: postgres
+    image: postgres:15
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      PGDATA: /data/postgres
-      POSTGRES_DB: bank
-    volumes:
-      - db:/data/postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "123"
+      POSTGRES_DB: fiapdb
     ports:
       - "5332:5432"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres-data:/var/lib/postgresql/data
     networks:
-      - db
+      - postgres-network
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -d postgres" ]
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d fiapdb" ]
       interval: 30s
       timeout: 10s
       retries: 5
-  networks:
-    db:
-      driver: bridge
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: local-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8083:80"
+    networks:
+      - postgres-network
+    depends_on:
+      - postgres
 
   rabbitmq:
     image: rabbitmq:3.13-management
+    container_name: rabbitmq
     ports:
-      - 15672:15672
-      - 5672:5672
+      - "15672:15672"
+      - "5672:5672"
+    networks:
+      - postgres-network
+    restart: unless-stopped
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - postgres-network
+    restart: unless-stopped
+
+networks:
+  postgres-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
