@@ -1,25 +1,37 @@
 
 services:
-  postgres:
-    container_name: postgres
-    image: postgres:15
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: "123"
-      POSTGRES_DB: fiapdb
+#  postgres:
+#    container_name: postgres
+#    image: postgres:15
+#    environment:
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: "123"
+#      POSTGRES_DB: fiapdb
+#    ports:
+#      - "5332:5432"
+#    volumes:
+#      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+#      - postgres-data:/var/lib/postgresql/data
+#    networks:
+#      - postgres-network
+#    restart: unless-stopped
+#    healthcheck:
+#      test: [ "CMD-SHELL", "pg_isready -U postgres -d fiapdb" ]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 5
+  mysqldb:
+    image: "mysql:8.0"
+    restart: always
     ports:
-      - "5332:5432"
-    volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-      - postgres-data:/var/lib/postgresql/data
+      - 3306:3306
     networks:
-      - postgres-network
-    restart: unless-stopped
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres -d fiapdb" ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+      - springapimysql-net
+    environment:
+      MYSQL_DATABASE: basics
+      MYSQL_USER: amila_one
+      MYSQL_PASSWORD: Amila_pw
+      MYSQL_ROOT_PASSWORD: Amila_Rpw
 
   frame_extractor_service:
     build:
@@ -36,8 +48,9 @@ services:
     restart: unless-stopped
 
 networks:
-  postgres-network:
-    driver: bridge
+  springapimysql-net:
+#  postgres-network:
+#    driver: bridge
 
 volumes:
   postgres-data:
