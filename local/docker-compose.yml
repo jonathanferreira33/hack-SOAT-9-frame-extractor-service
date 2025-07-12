@@ -21,38 +21,6 @@ services:
       timeout: 10s
       retries: 5
 
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: local-pgadmin
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-    ports:
-      - "8083:80"
-    networks:
-      - postgres-network
-    depends_on:
-      - postgres
-
-  rabbitmq:
-    image: rabbitmq:3.13-management
-    container_name: rabbitmq
-    ports:
-      - "15672:15672"
-      - "5672:5672"
-    networks:
-      - postgres-network
-    restart: unless-stopped
-
-  redis:
-    image: redis:latest
-    container_name: redis
-    ports:
-      - "6379:6379"
-    networks:
-      - postgres-network
-    restart: unless-stopped
-
   frame_extractor_service:
     build:
       context: ../
