@@ -2,6 +2,7 @@ package com.hack_SOAT_9.frame_extractor_service.service;
 
 import com.hack_SOAT_9.frame_extractor_service.domain.VideoMessage;
 import com.hack_SOAT_9.frame_extractor_service.domain.entity.VideoProcessingEventEntity;
+import com.hack_SOAT_9.frame_extractor_service.messaging.ErrorEventPublisher;
 import com.hack_SOAT_9.frame_extractor_service.utils.VideoMessageMapper;
 import com.hack_SOAT_9.frame_extractor_service.utils.VideoProcessingStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,9 @@ public class VideoProcessorService {
     private final VideoEventService videoEventService;
 
     private static final String FRAME_OUTPUT_DIR = "frames";
+
+    @Autowired
+    private ErrorEventPublisher errorEventPublisher;
 
     @Autowired
     public VideoProcessorService(VideoEventService videoEventService) {
@@ -78,6 +82,9 @@ public class VideoProcessorService {
             System.out.println("ZIP gerado: " + zipFileName);
 
         } catch (Exception e) {
+            if (event.userEmail() != null) {
+                errorEventPublisher.publishError(event.userEmail(), e.getMessage());
+            }
             eventEntity.setStatus(VideoProcessingStatus.ERROR);
             videoEventService.saveEvent(eventEntity);
             e.printStackTrace();

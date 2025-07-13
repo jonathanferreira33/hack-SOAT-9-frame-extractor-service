@@ -25,6 +25,7 @@ public class VideoProcessingEventEntity {
     private String videoName;
     private String outputDir;
     private String userID;
+    private String userEmail;
     private LocalDateTime queuedAt;
     private LocalDateTime completedAt;
 

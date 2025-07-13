@@ -40,6 +40,7 @@ public class VideoMessageMapper {
 
         return new VideoMessage(
                 entity.getUserID(),
+                entity.getUserEmail(),
                 entity.getVideoName(),
                 entity.getOutputDir(),
                 entity.getVideoPath(),

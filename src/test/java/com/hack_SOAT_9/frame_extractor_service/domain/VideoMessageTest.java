@@ -25,13 +25,14 @@ class VideoMessageTest {
     @Test
     void testFull() {
         String userId = "user123";
+        String userEmail = "user@email.com";
         String videoName = "video.mp4";
         String outputDir = "/output";
         String videoPath = "/path/to/video.mp4";
         String queuedAt = "2025-07-12T10:00:00";
         VideoProcessingStatus status = VideoProcessingStatus.SUCCESS;
 
-        VideoMessage message = VideoMessage.full(userId, videoName, outputDir, videoPath, queuedAt, status);
+        VideoMessage message = VideoMessage.full(userId, userEmail, videoName, outputDir, videoPath, queuedAt, status);
 
         assertEquals(userId, message.userId());
         assertEquals(videoName, message.videoName());

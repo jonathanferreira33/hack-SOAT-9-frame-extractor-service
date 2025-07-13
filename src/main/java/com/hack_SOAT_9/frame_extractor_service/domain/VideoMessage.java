@@ -6,6 +6,7 @@ import java.io.Serializable;
 
 public record VideoMessage (
     String userId,
+    String userEmail,
     String videoName,
     String outputDir,
     String videoPath,
@@ -15,6 +16,7 @@ public record VideoMessage (
     public static VideoMessage withVideoNameAndPath(String videoName, String videoPath) {
         return new VideoMessage(
                 null,
+                null,
                 videoName,
                 null,
                 videoPath,
@@ -23,10 +25,11 @@ public record VideoMessage (
         );
     }
 
-    public static VideoMessage full(String userId, String videoName, String outputDir,
+    public static VideoMessage full(String userId, String userEmail, String videoName, String outputDir,
                                     String videoPath, String queuedAt, VideoProcessingStatus status) {
         return new VideoMessage(
                 userId,
+                userEmail,
                 videoName,
                 outputDir,
                 videoPath,

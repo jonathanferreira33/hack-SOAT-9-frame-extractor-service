@@ -17,6 +17,7 @@ public class VideoMessageMapperTest {
         String dateTimeStr = "2025-07-12T10:00:00";
         VideoMessage record = new VideoMessage(
                 "user123",
+                "user@email.com",
                 "video.mp4",
                 "/output",
                 "/path/video.mp4",
@@ -45,6 +46,7 @@ public class VideoMessageMapperTest {
     void testToEntity_withNullQueuedAt() {
         VideoMessage record = new VideoMessage(
                 "user123",
+                "user@email.com",
                 "video.mp4",
                 "/output",
                 "/path/video.mp4",
