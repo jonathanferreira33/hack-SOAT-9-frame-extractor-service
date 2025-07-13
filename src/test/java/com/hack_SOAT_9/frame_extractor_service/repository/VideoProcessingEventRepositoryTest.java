@@ -1,39 +1,45 @@
 package com.hack_SOAT_9.frame_extractor_service.repository;
 
 import com.hack_SOAT_9.frame_extractor_service.domain.entity.VideoProcessingEventEntity;
+import com.hack_SOAT_9.frame_extractor_service.utils.VideoProcessingStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
+@SpringBootTest
 @ActiveProfiles("test")
-public class VideoProcessingEventRepositoryTest {
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
+class VideoProcessingEventRepositoryTest {
 
     @Autowired
     private VideoProcessingEventRepository repository;
 
     @Test
     void testFindAllByUserID() {
-        VideoProcessingEventEntity event1 = new VideoProcessingEventEntity();
-        event1.setUserID("user123");
-        repository.save(event1);
+        // Arrange
+        VideoProcessingEventEntity entity = new VideoProcessingEventEntity();
+        entity.setUserID("user123");
+        entity.setVideoName("example.mp4");
+        entity.setVideoPath("/videos/example.mp4");
+        entity.setOutputDir("/output");
+        entity.setQueuedAt(LocalDateTime.now());
+        entity.setCompletedAt(LocalDateTime.now().plusMinutes(2));
+        entity.setStatus(VideoProcessingStatus.SUCCESS);
 
-        VideoProcessingEventEntity event2 = new VideoProcessingEventEntity();
-        event2.setUserID("user123");
-        repository.save(event2);
+        repository.save(entity);
 
-        VideoProcessingEventEntity event3 = new VideoProcessingEventEntity();
-        event3.setUserID("otherUser");
-        repository.save(event3);
+        // Act
+        List<VideoProcessingEventEntity> results = repository.findAllByUserID("user123");
 
-        List<VideoProcessingEventEntity> result = repository.findAllByUserID("user123");
-
-        assertThat(result).hasSize(2);
-        assertThat(result).allMatch(e -> "user123".equals(e.getUserID()));
+        // Assert
+        assertThat(results).hasSize(1);
+        assertThat(results.get(0).getVideoName()).isEqualTo("example.mp4");
     }
 }

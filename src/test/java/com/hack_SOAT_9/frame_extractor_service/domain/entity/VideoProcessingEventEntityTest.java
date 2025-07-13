@@ -1,6 +1,5 @@
-package com.hack_SOAT_9.frame_extractor_service.domain;
+package com.hack_SOAT_9.frame_extractor_service.domain.entity;
 
-import com.hack_SOAT_9.frame_extractor_service.domain.entity.VideoProcessingEventEntity;
 import com.hack_SOAT_9.frame_extractor_service.utils.VideoProcessingStatus;
 import org.junit.jupiter.api.Test;
 

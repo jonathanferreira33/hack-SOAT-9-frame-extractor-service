@@ -29,6 +29,7 @@ public class VideoProcessingEventEntity {
     private LocalDateTime completedAt;
 
     @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "varchar(255)")
     private VideoProcessingStatus status;
 
 }
