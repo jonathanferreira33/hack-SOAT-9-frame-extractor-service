@@ -16,6 +16,7 @@ public class VideoMessageMapper {
         VideoProcessingEventEntity entity = new VideoProcessingEventEntity();
 
         entity.setUserID(message.userId());
+        entity.setUserEmail(message.userEmail());
         entity.setVideoName(message.videoName());
         entity.setOutputDir(message.outputDir());
         entity.setVideoPath(message.videoPath());
