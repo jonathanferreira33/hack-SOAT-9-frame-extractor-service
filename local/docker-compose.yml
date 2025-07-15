@@ -1,56 +1,48 @@
-
 services:
-#  postgres:
-#    container_name: postgres
-#    image: postgres:15
-#    environment:
-#      POSTGRES_USER: postgres
-#      POSTGRES_PASSWORD: "123"
-#      POSTGRES_DB: fiapdb
-#    ports:
-#      - "5332:5432"
-#    volumes:
-#      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-#      - postgres-data:/var/lib/postgresql/data
-#    networks:
-#      - postgres-network
-#    restart: unless-stopped
-#    healthcheck:
-#      test: [ "CMD-SHELL", "pg_isready -U postgres -d fiapdb" ]
-#      interval: 30s
-#      timeout: 10s
-#      retries: 5
-  mysqldb:
-    image: "mysql:8.0"
-    restart: always
-    ports:
-      - 3306:3306
-    networks:
-      - springapimysql-net
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
     environment:
-      MYSQL_DATABASE: basics
-      MYSQL_USER: amila_one
-      MYSQL_PASSWORD: Amila_pw
-      MYSQL_ROOT_PASSWORD: Amila_Rpw
+      MYSQL_ROOT_PASSWORD: 123
+      MYSQL_DATABASE: fiapdb
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: 123
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./local/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - app-network
+    restart: unless-stopped
 
   frame_extractor_service:
     build:
       context: ../
+      dockerfile: Dockerfile
     container_name: frame_extractor_service
     ports:
       - "8082:8082"
     depends_on:
-      - postgres
-      - rabbitmq
-      - redis
+      - mysql
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/fiapdb?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: 123
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQL8Dialect
     networks:
-      - postgres-network
+      - app-network
     restart: unless-stopped
 
-networks:
-  springapimysql-net:
-#  postgres-network:
-#    driver: bridge
-
 volumes:
-  postgres-data:
+  mysql-data:
+
+networks:
+  app-network:
+    driver: bridge
